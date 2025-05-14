@@ -1,0 +1,65 @@
+---
+title: "Analyzing International Education Costs dataset"
+author: "Yelyzaveta(Liza) Luizova"
+date: "2025-05-14"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Exploratory analysis of International Education Costs dataset
+
+## Introduction
+
+International Education Costs is a dataset taken for an exploration from kaggle (reference: https://www.kaggle.com/datasets/adilshamim8/cost-of-international-education/data). This dataset is a summary of international fees for universities based on countries, cities, tuition costs, various programs and living expenses. 
+
+## Data:
+
+Reference: https://www.kaggle.com/datasets/adilshamim8/cost-of-international-education/data
+Sorted data by Columns: Country, City, University, Program, Level, Duration Years, Tuition(USD), Living Cost Index, Rent(USD), Visa fee(USD), Insurance(USD), Exchange rate. 
+
+## Packages needed to load:
+install.packages("dplyr")
+install.packages("ggplot2")
+library(dplyr)
+library(ggplot2)
+
+# Import the data:
+
+data <- read.csv("C:/Users/Лиза/Desktop/Rstudio projects/International_Education_Costs.csv")
+data
+
+# Group, find the average of tuition, and sort top 10 countries:
+top_countries <- data %>%
+  group_by(country) %>%
+  summarise(avg_cost=mean(tuition_usd, na.rm=TRUE)) %>%
+  arrange(desc(avg_cost)) %>%
+  slice_head(n = 10) %>%
+  pull(country)
+  
+# Filter: 
+
+filtered_data <- data %>%
+  filter(country %in% top_countries) %>%
+  mutate(country = factor(country, levels=top_countries))
+
+## Plot 1: Tuition by Top 10 Countries(with average tuition):
+
+ggplot(filtered_data, aes(x=tuition_usd, y=country)) + geom_boxplot(fill="orange", color="black", notch=FALSE) + stat_summary(
+  fun=mean, geom="point", shape=20, size=3, color="red"
+) + labs(
+  title = "Tuition by Top 10 countries", 
+  x = "Tuition in USD",
+  y = "Country"
+) + theme_minimal()
+
+## Observations: 
+The graph shows the top 10 listed counties by their international tuition costs. The data demonstrates that among the top 10 countries with highest tuition: 
+        -  Lebanon has the lowest average tuition (red point points away from the orange box range).
+        -  The UK has the most consistent, highest average cost (red point is within the range, and is in the perfect medium). 
+        -  Countries like Australia and Canada show high consistency in their tuition costs. 
+
+##
+
