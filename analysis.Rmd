@@ -46,6 +46,8 @@ filtered_data <- data %>%
   mutate(country = factor(country, levels=top_countries))
 
 ## Plot 1: Tuition by Top 10 Countries(with average tuition):
+```{r tuition-plot, echo=FALSE, fig.align='center', fig.width=7, fig.height=4}
+library(ggplot2)
 
 ggplot(filtered_data, aes(x=tuition_usd, y=country)) + geom_boxplot(fill="orange", color="black", notch=FALSE) + stat_summary(
   fun=mean, geom="point", shape=20, size=3, color="red"
@@ -54,6 +56,7 @@ ggplot(filtered_data, aes(x=tuition_usd, y=country)) + geom_boxplot(fill="orange
   x = "Tuition in USD",
   y = "Country"
 ) + theme_minimal()
+```
 
 ## Observations: 
 The graph shows the top 10 listed counties by their international tuition costs. The data demonstrates that among the top 10 countries with highest tuition: 
@@ -61,5 +64,60 @@ The graph shows the top 10 listed counties by their international tuition costs.
         -  The UK has the most consistent, highest average cost (red point is within the range, and is in the perfect medium). 
         -  Countries like Australia and Canada show high consistency in their tuition costs. 
 
-##
+## Plot 2: Rent expenses per Top 10 Countries
+```{r rent-plot, echo=FALSE, fig.align='center', fig.width=7, fig.height=4}
+library(ggplot2) 
 
+avg_rent <- data %>%
+  group_by(Country) %>%
+  summarise(avg_rent_cost = mean(Rent_USD, na.rm=TRUE)) %>%
+  arrange(desc(avg_rent_cost)) %>%
+  slice_head(n = 10) 
+
+ggplot(avg_rent, aes(x = reorder(Country, avg_rent_cost), y = avg_rent_cost)) +
+  geom_col(fill = "red") +
+  coord_flip() +
+  labs(
+    title = "Average Rent Expenses (Top 10 Countries)",
+    x = "Country",
+    y = "Rent in USD"
+  ) + theme_minimal()
+```
+
+## Observations:
+The graph shows that in average, USA has the highest average rent expenses for students among the top 10 countries, whereas Ireland has the lowest ones. 
+
+        
+## Plot 3: Average living cost in Top 10 Countries:
+```{r living-plot, echo=FALSE, fig.align='center', fig.width=7, fig.height=4}
+library(ggplot2)
+
+avg_living <- data %>%
+  group_by(Country) %>%
+  summarise(avg_living_cost = mean(Living_Cost_Index, na.rm=TRUE)) %>%
+  arrange(desc(avg_living_cost)) %>%
+  slice_head(n = 10)
+
+ggplot(avg_living, aes(x = reorder(Country, avg_living_cost), y = avg_living_cost)) + geom_col(fill = "purple") +
+  coord_flip() + labs(
+  title = "Average Living Cost Index (Top 10 Countries)", 
+  x = "Country", 
+  y = "Index"
+  ) + theme_minimal()
+```
+
+## Observations:
+The graph demonstrates top 10 countries with the highest rental expenses for international students. It is indicated that:
+        -  Switzerland has the highest living expenses for students.
+        -  New Zealand shows the lowest amount of expenses.
+        -  For all of the top 10 countries, the index of average living cost of students are more than a half of the total (>50). New Zealand with the lowest index shows about 74/100. 
+        
+## Summary
+
+This analysis highlights the financial landscape faced by international students across various countries. By examining tuition fees, rent expenses, and the general cost of living, we gain a clearer perspective on the most and least financially demanding study destinations.
+
+       -  Tuition Fees: Countries like the United Kingdom, Australia, and Canada consistently show high and relatively stable tuition fees for international students. In contrast, Lebanon demonstrates significantly lower tuition costs, making it a more affordable option academically.
+
+       -  Rent Expenses: The United States stands out as the country with the highest average rent, followed by other countries with high urban housing demand. Ireland ranks lowest in average rent among the top 10, suggesting more accessible accommodation options.
+
+       -  Living Cost Index: Switzerland ranks highest in terms of living costs, indicating a generally expensive environment for students. Even the lowest country in the top 10 list, New Zealand, maintains a high living cost index, reinforcing that all top destinations carry a significant financial burden beyond tuition.
