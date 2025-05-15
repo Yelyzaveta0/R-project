@@ -32,18 +32,18 @@ data <- read.csv("C:/Users/Лиза/Desktop/Rstudio projects/International_Educa
 data
 
 # Group, find the average of tuition, and sort top 10 countries:
+
 top_countries <- data %>%
-  group_by(country) %>%
-  summarise(avg_cost=mean(tuition_usd, na.rm=TRUE)) %>%
+  group_by(Country) %>%
+  summarise(avg_cost=mean(Tuition_USD, na.rm=TRUE)) %>%
   arrange(desc(avg_cost)) %>%
   slice_head(n = 10) %>%
-  pull(country)
-  
-# Filter: 
+  pull(Country)
 
 filtered_data <- data %>%
-  filter(country %in% top_countries) %>%
-  mutate(country = factor(country, levels=top_countries))
+  filter(Country %in% top_countries) %>%
+  mutate(Country = factor(Country, levels=top_countries))
+
 
 ## Plot 1: Tuition by Top 10 Countries(with average tuition):
 ```{r tuition-plot, echo=FALSE, fig.align='center', fig.width=7, fig.height=4}
@@ -121,3 +121,4 @@ This analysis highlights the financial landscape faced by international students
        -  Rent Expenses: The United States stands out as the country with the highest average rent, followed by other countries with high urban housing demand. Ireland ranks lowest in average rent among the top 10, suggesting more accessible accommodation options.
 
        -  Living Cost Index: Switzerland ranks highest in terms of living costs, indicating a generally expensive environment for students. Even the lowest country in the top 10 list, New Zealand, maintains a high living cost index, reinforcing that all top destinations carry a significant financial burden beyond tuition.
+
