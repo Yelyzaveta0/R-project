@@ -2,12 +2,15 @@
 title: "Analyzing International Education Costs dataset"
 author: "Yelyzaveta(Liza) Luizova"
 date: "2025-05-14"
-output: pdf_document
+output:
+  pdf_document:
+    latex_engine: xelatex
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
 
 ### Exploratory analysis of International Education Costs dataset
 
@@ -21,35 +24,38 @@ Reference: https://www.kaggle.com/datasets/adilshamim8/cost-of-international-edu
 Sorted data by Columns: Country, City, University, Program, Level, Duration Years, Tuition(USD), Living Cost Index, Rent(USD), Visa fee(USD), Insurance(USD), Exchange rate. 
 
 ## Packages needed to load:
+tinytex::install_tinytex()
 install.packages("dplyr")
 install.packages("ggplot2")
 library(dplyr)
 library(ggplot2)
 
 # Import the data:
-
-data <- read.csv("C:/Users/Лиза/Desktop/Rstudio projects/International_Education_Costs.csv")
-data
+```{r load-data, include=FALSE}
+edu_data <- read.csv("C:/Users/Лиза/Desktop/Rstudio projects/International_Education_Costs.csv")
+```
+#Use: edu_data <- read.csv("C:/Users/Лиза/Desktop/Rstudio projects/International_Education_Costs.csv")
+edu_data
 
 # Group, find the average of tuition, and sort top 10 countries:
-
-top_countries <- data %>%
+```{r tuition-plot1, echo=FALSE, fig.align='center', fig.width=7, fig.height=4}
+library(ggplot2)
+library(dplyr)
+top_countries <- edu_data %>%
   group_by(Country) %>%
   summarise(avg_cost=mean(Tuition_USD, na.rm=TRUE)) %>%
   arrange(desc(avg_cost)) %>%
   slice_head(n = 10) %>%
   pull(Country)
 
-filtered_data <- data %>%
+filtered_data <- edu_data %>%
   filter(Country %in% top_countries) %>%
   mutate(Country = factor(Country, levels=top_countries))
 
 
 ## Plot 1: Tuition by Top 10 Countries(with average tuition):
-```{r tuition-plot, echo=FALSE, fig.align='center', fig.width=7, fig.height=4}
-library(ggplot2)
 
-ggplot(filtered_data, aes(x=tuition_usd, y=country)) + geom_boxplot(fill="orange", color="black", notch=FALSE) + stat_summary(
+ggplot(filtered_data, aes(x=Tuition_USD, y=Country)) + geom_boxplot(fill="orange", color="black", notch=FALSE) + stat_summary(
   fun=mean, geom="point", shape=20, size=3, color="red"
 ) + labs(
   title = "Tuition by Top 10 countries", 
@@ -65,10 +71,8 @@ The graph shows the top 10 listed counties by their international tuition costs.
         -  Countries like Australia and Canada show high consistency in their tuition costs. 
 
 ## Plot 2: Rent expenses per Top 10 Countries
-```{r rent-plot, echo=FALSE, fig.align='center', fig.width=7, fig.height=4}
-library(ggplot2) 
-
-avg_rent <- data %>%
+```{r tuition-plot2, echo=FALSE, fig.align='center', fig.width=7, fig.height=4}
+avg_rent <- edu_data %>%
   group_by(Country) %>%
   summarise(avg_rent_cost = mean(Rent_USD, na.rm=TRUE)) %>%
   arrange(desc(avg_rent_cost)) %>%
@@ -89,10 +93,8 @@ The graph shows that in average, USA has the highest average rent expenses for s
 
         
 ## Plot 3: Average living cost in Top 10 Countries:
-```{r living-plot, echo=FALSE, fig.align='center', fig.width=7, fig.height=4}
-library(ggplot2)
-
-avg_living <- data %>%
+```{r tuition-plot3, echo=FALSE, fig.align='center', fig.width=7, fig.height=4}
+avg_living <- edu_data %>%
   group_by(Country) %>%
   summarise(avg_living_cost = mean(Living_Cost_Index, na.rm=TRUE)) %>%
   arrange(desc(avg_living_cost)) %>%
@@ -105,7 +107,6 @@ ggplot(avg_living, aes(x = reorder(Country, avg_living_cost), y = avg_living_cos
   y = "Index"
   ) + theme_minimal()
 ```
-
 ## Observations:
 The graph demonstrates top 10 countries with the highest rental expenses for international students. It is indicated that:
         -  Switzerland has the highest living expenses for students.
