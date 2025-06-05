@@ -3,25 +3,25 @@ install.packages("dplyr")
 install.packages("ggplot2")
 library(dplyr)
 library(ggplot2)
-data <- read.csv("C:/Users/Лиза/Desktop/Rstudio projects/International_Education_Costs.csv")
-data
-summary(data)
-mean(data$Rent_USD)
+edu_data <- read.csv("C:/Users/Лиза/Desktop/Rstudio projects/International_Education_Costs.csv")
+edu_data
+summary(edu_data)
+mean(edu_data$Rent_USD)
 
 #1 group by country and find the avg tuition cost
-data %>%
+edu_data %>%
   group_by(Country) %>%
   summarise(AvgTution=mean(Tuition_USD))
 
 #2 top 10 most expensive cities for education
 
-data <- data %>% clean_names()
-data
+edu_data <- edu_data %>% clean_names()
+edu_data
 
 #boxplot(tuition_usd ~ country, data=data, main="Tuition by Country", xlab="Tuition(USD)", ylab="Country",col="orange", horizontal=TRUE, notch=FALSE)
 
 
-top_countries <- data %>%
+top_countries <- edu_data %>%
   group_by(Country) %>%
   summarise(avg_cost=mean(Tuition_USD, na.rm=TRUE)) %>%
   arrange(desc(avg_cost)) %>%
@@ -35,7 +35,7 @@ table(filtered_data$Country)
 
 
 
-filtered_data <- data %>%
+filtered_data <- edu_data %>%
   filter(Country %in% top_countries) %>%
   mutate(Country = factor(Country, levels=top_countries))
 
@@ -49,7 +49,7 @@ ggplot(filtered_data, aes(x=Tuition_USD, y=Country)) + geom_boxplot(fill="orange
 ) + theme_minimal()
 
 #Rent expenses by top 10 countries with tuition
-avg_rent <- data %>%
+avg_rent <- edu_data %>%
   group_by(Country) %>%
   summarise(avg_rent_cost = mean(Rent_USD, na.rm=TRUE)) %>%
   arrange(desc(avg_rent_cost)) %>%
@@ -66,7 +66,7 @@ ggplot(avg_rent, aes(x = reorder(Country, avg_rent_cost), y = avg_rent_cost)) +
 
 
 #Average living index in top 10 countries
-avg_living <- data %>%
+avg_living <- edu_data %>%
   group_by(Country) %>%
   summarise(avg_living_cost = mean(Living_Cost_Index, na.rm=TRUE)) %>%
   arrange(desc(avg_living_cost)) %>%
@@ -78,3 +78,29 @@ ggplot(avg_living, aes(x = reorder(Country, avg_living_cost), y = avg_living_cos
   x = "Country", 
   y = "Index"
   ) + theme_minimal()
+
+max(data$Rent_USD)
+
+
+#Top 10 most expensive majors by USD tuition
+expensive_major <- edu_data %>%
+  group_by(Program) %>%
+  summarise(max_tuition = max(Tuition_USD, na.rm=TRUE)) %>%
+  arrange(desc(max_tuition)) %>%
+  slice_head(n = 10)
+
+ggplot(expensive_major, aes(x=reorder(Program, max_tuition), y=max_tuition)) + geom_col(fill = "green") + 
+  coord_flip() + labs(
+    title="Top 10 most expensive majors", 
+    x="Program",
+    y="Tuition(USD)"
+  ) + theme_minimal()
+
+top_majors <- edu_data %>%
+  filter(Program %in% expensive_major) %>%
+  mutate(Program = factor(Program, level=expensive_major))
+
+economics <- edu_data %>%
+  filter(Program == "Economics")
+
+summary(economics)
