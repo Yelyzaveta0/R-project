@@ -1,1 +1,1 @@
-# R-project
+# R-project: analysis of a data set
