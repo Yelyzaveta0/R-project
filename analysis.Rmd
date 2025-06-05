@@ -20,8 +20,8 @@ International Education Costs is a dataset taken for an exploration from kaggle 
 
 ## Data:
 
-Reference: https://www.kaggle.com/datasets/adilshamim8/cost-of-international-education/data
-Sorted data by Columns: Country, City, University, Program, Level, Duration Years, Tuition(USD), Living Cost Index, Rent(USD), Visa fee(USD), Insurance(USD), Exchange rate. 
+1) Reference: https://www.kaggle.com/datasets/adilshamim8/cost-of-international-education/data
+2) Sorted data by Columns: Country, City, University, Program, Level, Duration Years, Tuition(USD), Living Cost Index, Rent(USD), Visa fee(USD), Insurance(USD), Exchange rate. 
 
 ## Packages needed to load:
 tinytex::install_tinytex()
@@ -30,12 +30,12 @@ install.packages("ggplot2")
 library(dplyr)
 library(ggplot2)
 
-# Import the data:
+## Import the data:
 ```{r load-data, include=FALSE}
 edu_data <- read.csv("C:/Users/Лиза/Desktop/Rstudio projects/International_Education_Costs.csv")
 ```
 #Use: edu_data <- read.csv("C:/Users/Лиза/Desktop/Rstudio projects/International_Education_Costs.csv")
-edu_data
+# edu_data
 
 # Group, find the average of tuition, and sort top 10 countries:
 ```{r tuition-plot1, echo=FALSE, fig.align='center', fig.width=7, fig.height=4}
@@ -66,9 +66,9 @@ ggplot(filtered_data, aes(x=Tuition_USD, y=Country)) + geom_boxplot(fill="orange
 
 ## Observations: 
 The graph shows the top 10 listed counties by their international tuition costs. The data demonstrates that among the top 10 countries with highest tuition: 
-        -  Lebanon has the lowest average tuition (red point points away from the orange box range).
-        -  The UK has the most consistent, highest average cost (red point is within the range, and is in the perfect medium). 
-        -  Countries like Australia and Canada show high consistency in their tuition costs. 
+  -  Lebanon has the lowest average tuition (red point points away from the orange box range).
+  -  The UK has the most consistent, highest average cost (red point is within the range, and is in the perfect medium). 
+  -  Countries like Australia and Canada show high consistency in their tuition costs. 
 
 ## Plot 2: Rent expenses per Top 10 Countries
 ```{r tuition-plot2, echo=FALSE, fig.align='center', fig.width=7, fig.height=4}
@@ -109,17 +109,40 @@ ggplot(avg_living, aes(x = reorder(Country, avg_living_cost), y = avg_living_cos
 ```
 ## Observations:
 The graph demonstrates top 10 countries with the highest rental expenses for international students. It is indicated that:
-        -  Switzerland has the highest living expenses for students.
-        -  New Zealand shows the lowest amount of expenses.
-        -  For all of the top 10 countries, the index of average living cost of students are more than a half of the total (>50). New Zealand with the lowest index shows about 74/100. 
+  -  Switzerland has the highest living expenses for students.
+  -  New Zealand shows the lowest amount of expenses.
+  -  For all of the top 10 countries, the index of average living cost of students are more than a half of the total (>50). New Zealand with the lowest index shows about 74/100. 
+        
+## Plot 4: Top 10 most expensive majors by Tuition(in USD):
+```{r tuition-plot4, echo=FALSE, fig.align='center', fig.width=7, fig.height=4}
+expensive_major <- edu_data %>%
+  group_by(Program) %>%
+  summarise(max_tuition = max(Tuition_USD, na.rm=TRUE)) %>%
+  arrange(desc(max_tuition)) %>%
+  slice_head(n = 10)
+
+ggplot(expensive_major, aes(x=reorder(Program, max_tuition), y=max_tuition)) + geom_col(fill = "green") + 
+  coord_flip() + labs(
+    title="Top 10 most expensive majors", 
+    x="Program",
+    y="Tuition(USD)"
+  ) + theme_minimal()
+```
+
+## Observations:
+The graph depicts top 10 the most expensive majors according to their tuition cost in USD. The data is grouped by Program column. Note: in data set, a program may be repeated as it also varies from univeristy, therefore, the tuition is also different and the graph takes only its maximum. 
+  - On the graph, there are several majors who have the same maximum amount of tuition. To be more precise, if we do summary of the taable of sorted majors, it is known that Data Science and Economics have maximum of 62000 USD; Computer Science and Artificial Intelligence 58000 USD.And so on to the bottom to the 10th most expensive major, it is Aerospace Engineering, which has a maximum of 52300 and does not share this maximum with any other major. 
+
         
 ## Summary
 
 This analysis highlights the financial landscape faced by international students across various countries. By examining tuition fees, rent expenses, and the general cost of living, we gain a clearer perspective on the most and least financially demanding study destinations.
 
-       -  Tuition Fees: Countries like the United Kingdom, Australia, and Canada consistently show high and relatively stable tuition fees for international students. In contrast, Lebanon demonstrates significantly lower tuition costs, making it a more affordable option academically.
+  -  Tuition Fees: Countries like the United Kingdom, Australia, and Canada consistently show high and relatively stable tuition fees for international students. In contrast, Lebanon demonstrates significantly lower tuition costs, making it a more affordable option academically.
 
-       -  Rent Expenses: The United States stands out as the country with the highest average rent, followed by other countries with high urban housing demand. Ireland ranks lowest in average rent among the top 10, suggesting more accessible accommodation options.
+  -  Rent Expenses: The United States stands out as the country with the highest average rent, followed by other countries with high urban housing demand. Ireland ranks lowest in average rent among the top 10, suggesting more accessible accommodation options.
 
-       -  Living Cost Index: Switzerland ranks highest in terms of living costs, indicating a generally expensive environment for students. Even the lowest country in the top 10 list, New Zealand, maintains a high living cost index, reinforcing that all top destinations carry a significant financial burden beyond tuition.
+  -  Living Cost Index: Switzerland ranks highest in terms of living costs, indicating a generally expensive environment for students. Even the lowest country in the top 10 list, New Zealand, maintains a high living cost index, reinforcing that all top destinations carry a significant financial burden beyond tuition.
+       
+  -  Expensive majors: Most top 10 expensive majors share their maximum costs with other majors. The top leaders are Economics and Data Science with a cost of 62000 USD dollars. While aerospace engineering is the least in top 10 expensive majors with lowest maximum out of the rest programs. 
 
