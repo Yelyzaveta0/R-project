@@ -27,17 +27,22 @@ International Education Costs is a dataset taken for an exploration from kaggle 
 tinytex::install_tinytex()
 install.packages("dplyr")
 install.packages("ggplot2")
+install.packages("corrplot")
+install.packages("GGally")
+library(corrplot)
 library(dplyr)
 library(ggplot2)
+library(corrplot)
+library(GGally)
 
 ## Import the data:
 ```{r load-data, include=FALSE}
 edu_data <- read.csv("C:/Users/Лиза/Desktop/Rstudio projects/International_Education_Costs.csv")
 ```
 #Use: edu_data <- read.csv("C:/Users/Лиза/Desktop/Rstudio projects/International_Education_Costs.csv")
-# edu_data
+#edu_data
 
-# Group, find the average of tuition, and sort top 10 countries:
+## Plot 1: Tuition by Top 10 Countries(with average tuition): 
 ```{r tuition-plot1, echo=FALSE, fig.align='center', fig.width=7, fig.height=4}
 library(ggplot2)
 library(dplyr)
@@ -52,8 +57,6 @@ filtered_data <- edu_data %>%
   filter(Country %in% top_countries) %>%
   mutate(Country = factor(Country, levels=top_countries))
 
-
-## Plot 1: Tuition by Top 10 Countries(with average tuition):
 
 ggplot(filtered_data, aes(x=Tuition_USD, y=Country)) + geom_boxplot(fill="orange", color="black", notch=FALSE) + stat_summary(
   fun=mean, geom="point", shape=20, size=3, color="red"
@@ -130,10 +133,42 @@ ggplot(expensive_major, aes(x=reorder(Program, max_tuition), y=max_tuition)) + g
 ```
 
 ## Observations:
-The graph depicts top 10 the most expensive majors according to their tuition cost in USD. The data is grouped by Program column. Note: in data set, a program may be repeated as it also varies from univeristy, therefore, the tuition is also different and the graph takes only its maximum. 
-  - On the graph, there are several majors who have the same maximum amount of tuition. To be more precise, if we do summary of the taable of sorted majors, it is known that Data Science and Economics have maximum of 62000 USD; Computer Science and Artificial Intelligence 58000 USD.And so on to the bottom to the 10th most expensive major, it is Aerospace Engineering, which has a maximum of 52300 and does not share this maximum with any other major. 
+The graph depicts top 10 the most expensive majors according to their tuition cost in USD. The data is grouped by Program column. Note: in data set, a program may be repeated as it also varies from university, therefore, the tuition is also different and the graph takes only its maximum. 
+  - On the graph, there are several majors who have the same maximum amount of tuition. To be more precise, if we do summary of the table of sorted majors, it is known that Data Science and Economics have maximum of 62000 USD; Computer Science and Artificial Intelligence 58000 USD.And so on to the bottom to the 10th most expensive major, it is Aerospace Engineering, which has a maximum of 52300 and does not share this maximum with any other major. 
 
-        
+
+## Plot 5: Correlation analysis between numeric data:
+```{r tuition-plot5, echo=FALSE, fig.align='center', fig.width=7, fig.height=4}
+library(corrplot)
+numeric_data <- edu_data %>%
+  select(Tuition_USD, Rent_USD, Visa_Fee_USD, Insurance_USD)
+cor_ma <- cor(numeric_data, use = "complete.obs")
+print(cor_ma)
+
+corrplot(cor_ma, method="color", type="lower", addCoef.col="black")
+```
+
+## Observations: 
+The given graph shows the strength and direction of linear relationships between the numeric data from the data set - tuition cost, rent cost, visa fee and insurance cost. The relationships between data is set based on the scale from -1 to 1, where: 
+ 1) -1: perfect negative correlation;
+ 2) 0: no correlation (no relationship);
+ 3) 1: perfect positive correlation.
+Based on the graphic interpretation: 
+ -  Rent and insurance correlation (0.78): means international students pay high insurance and rent;
+ -  Rent and tuition correlation (0.72): international students pay quite expensive cost for both, rent and tuition for studies (high tuition tends to come with high rent);
+ -  Insurance and tuition correlation (0.58): moderate positive relationship, the payment for insurance and tuition may vary and may not be the same;
+ -  Visa fee and tuition: moderate relationship, the cost may not be the same;
+ -  Visa fee and rent: weaker relationship, in most cases the costs for both of them may not be relevant; 
+ -  Insurance and visa: quite irrelevant to each other data - costs vary. 
+
+
+## Plot 6: linear relationship graph of correlated data: 
+```{r tuition-plot6, echo=FALSE, fig.align='center', fig.width=7, fig.height=4}
+library(GGally)
+ggpairs(cor_ma, lower=list(continuous = wrap("smooth", method = "lm", se = FALSE)),
+        diag = list(continuous = "densityDiag"),
+        upper = list(continuous = "cor")) + theme_bw()
+```
 ## Summary
 
 This analysis highlights the financial landscape faced by international students across various countries. By examining tuition fees, rent expenses, and the general cost of living, we gain a clearer perspective on the most and least financially demanding study destinations.
@@ -145,4 +180,6 @@ This analysis highlights the financial landscape faced by international students
   -  Living Cost Index: Switzerland ranks highest in terms of living costs, indicating a generally expensive environment for students. Even the lowest country in the top 10 list, New Zealand, maintains a high living cost index, reinforcing that all top destinations carry a significant financial burden beyond tuition.
        
   -  Expensive majors: Most top 10 expensive majors share their maximum costs with other majors. The top leaders are Economics and Data Science with a cost of 62000 USD dollars. While aerospace engineering is the least in top 10 expensive majors with lowest maximum out of the rest programs. 
+  
+  -  Correlation of numeric data: The analysis has shown that some data are set to be quite perfectly relevant, and some are least relevant. The significance of this work is to demonstrate that some data can be dependent on each other, and some don't. Based on this information, international students are tend to be paying more for both education and rent expenses, which makes it problematic in terms of finances. 
 
