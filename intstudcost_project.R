@@ -1,8 +1,14 @@
 getwd()
 install.packages("dplyr")
 install.packages("ggplot2")
+install.packages("ggcorrplot")
+install.packages("corrplot")
+install.packages("GGally")
 library(dplyr)
 library(ggplot2)
+library(ggcorrplot)
+library(corrplot)
+library(GGally)
 edu_data <- read.csv("C:/Users/Лиза/Desktop/Rstudio projects/International_Education_Costs.csv")
 edu_data
 summary(edu_data)
@@ -104,3 +110,17 @@ economics <- edu_data %>%
   filter(Program == "Economics")
 
 summary(economics)
+
+#Correlation analysis
+numeric_data <- edu_data %>%
+  select(Tuition_USD, Rent_USD, Visa_Fee_USD, Insurance_USD)
+cor_ma <- cor(numeric_data, use = "complete.obs")
+print(cor_ma)
+
+#ggcorrplot(cor_ma, method="circle", type="full", lab=TRUE, title="Correlation data")
+
+corrplot(cor_ma, method="color", type="lower", addCoef.col="black")
+
+ggpairs(cor_ma, lower=list(continuous = wrap("smooth", method = "lm", se = FALSE)),
+        diag = list(continuous = "densityDiag"),
+        upper = list(continuous = "cor")) + theme_bw()
